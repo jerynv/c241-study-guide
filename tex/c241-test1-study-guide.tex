@@ -1,0 +1,66 @@
+\documentclass[11pt]{article}
+\usepackage{guide}
+\reporttitle{C241 Test 1: The Study Guide I Wanted}{Jeryn Vicari}{Fall 2026}
+\setcounter{tocdepth}{1}
+
+\begin{document}
+\makereporttitle
+
+\begin{notebox}
+\textbf{Unofficial.} This isn't from the course staff, and it doesn't replace the lecture notes. Where this guide and the notes disagree, the notes and your TA win. Every example and practice problem in here is new; none of it comes from the homework or quizzes.
+\end{notebox}
+
+\section*{How to use this}
+\addcontentsline{toc}{section}{How to use this}
+
+Test 1 covers sets, propositional logic, constrained proofs, relations up to symmetry, functions, and (probably) graphs. On paper that's six topics. In practice it's one idea used over and over: \emph{everything is a claim about membership}, and every claim is either ``for all'' or ``there exists.'' Once that clicks, the proof chapter stops feeling like a separate subject.
+
+Each chapter goes the same way. First the intuition, in plain words. Then the precise definition, because the test grades the precise version. Then a picture, a worked example, and the places people usually slip. Every chapter ends with practice and full answers. The answers were checked by brute force on small examples, so you can trust them.
+
+A few suggestions that are worth more than any single section:
+\begin{itemize}
+\item \textbf{Do the practice cold.} Read the chapter, close it, then try the problems with nothing open. If you can only do it with the notes next to you, you don't have it yet, and the test is closed-notes apart from one sheet.
+\item \textbf{Write every column.} Most lost points on truth tables come from skipping an intermediate column, not from not knowing the connective.
+\item \textbf{Proofs need reps, not reading.} Chapter 3 is the longest for a reason. Three short proofs a day for a week beats one long session the night before.
+\item \textbf{Say ``member of'' and ``subset of.''} Never ``in.'' That one habit fixes half the set questions.
+\end{itemize}
+
+\begin{figure}[H]\centering
+\begin{tikzpicture}[node distance=0.55cm and 0.9cm, every node/.style={font=\small}]
+  \node[softbox,minimum width=3.1cm] (sets) {Ch 1: Sets\\ $\in$, $\subseteq$, $\cup\ \cap\ -$};
+  \node[softbox,minimum width=3.1cm,right=of sets] (logic) {Ch 2: Logic\\ $\land\ \lor\ \lnot\ \to$, truth tables};
+  \node[softbox,minimum width=3.1cm,right=of logic] (quant) {Ch 2: ``for all'' /\\ ``there exists''};
+  \node[softbox,minimum width=5cm,below=1.1cm of logic,line width=1.2pt] (proofs) {Ch 3: Constrained proofs\\ 5 definitions + 7 rules};
+  \node[softbox,minimum width=3.1cm,below=1.3cm of proofs,xshift=-4.4cm] (rel) {Ch 4: Relations\\ symmetry};
+  \node[softbox,minimum width=3.1cm,below=1.3cm of proofs,xshift=0cm] (fun) {Ch 4: Functions\\ injective, onto};
+  \node[softbox,minimum width=3.1cm,below=1.3cm of proofs,xshift=4.4cm] (gr) {Ch 5: Graphs\\ walks, paths, trees};
+  \draw[->] (sets) -- (logic);
+  \draw[->] (logic) -- (quant);
+  \draw[->] (sets.south) |- ($(proofs.west)+(0,0.15)$);
+  \draw[->] (logic) -- (proofs);
+  \draw[->] (quant.south) |- ($(proofs.east)+(0,0.15)$);
+  \draw[->] (proofs) -- (rel);
+  \draw[->] (proofs) -- (fun);
+  \draw[->] (proofs) -- (gr);
+  \draw[->,dashed] (rel) -- node[lbl,above,font=\scriptsize] {special kind of} (fun);
+  \draw[->,dashed] (rel.south) to[out=-25,in=-155] node[lbl,below] {edges are pairs too} (gr.south);
+\end{tikzpicture}
+\caption{How the chapters lean on each other. Proofs are the hub: symmetry, injectivity and ``is this a path'' are all claims you prove or refute with the same rules.}
+\end{figure}
+
+\tableofcontents
+\clearpage
+
+\input{chapters/01-sets}
+\clearpage
+\input{chapters/02-logic}
+\clearpage
+\input{chapters/03-proofs}
+\clearpage
+\input{chapters/04-relations-functions}
+\clearpage
+\input{chapters/05-graphs}
+\clearpage
+\input{chapters/06-test-day}
+
+\end{document}

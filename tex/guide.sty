@@ -1,0 +1,88 @@
+% guide.sty: page, font and TikZ style for the C241 study guide.
+% Use:  \documentclass[11pt]{article}
+%        \usepackage{guide}
+%        \reporttitle{Title}{Jeryn Vicari}{\today}
+%        \begin{document}\makereporttitle ... \end{document}
+% Symbols: always inside math mode ($∈$, $\subseteq$); Times New Roman text has no math glyphs.
+% Render: xelatex -interaction=nonstopmode -halt-on-error file.tex   (run twice for TOC/refs)
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{guide}[2026/10/03 C241 study guide style]
+
+% ---- page + fonts ----
+\RequirePackage[letterpaper,margin=1in]{geometry}
+\RequirePackage{amsmath,mathtools}
+\RequirePackage{fontspec}
+\setmainfont{Times New Roman}
+\RequirePackage{unicode-math}
+\setmathfont{STIX Two Math}
+\setmathfont[version=bold,FakeBold=2]{STIX Two Math}  % Times-compatible math; unicode symbols work inside $...$ (∈ ⊆ ∅ → ∧)
+\setmonofont{Menlo}[Scale=0.85]
+\RequirePackage{microtype}
+\frenchspacing
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\linespread{1.05}
+
+% ---- headings: numbered, bold ----
+\RequirePackage{titlesec}
+\titleformat{\section}{\normalfont\fontsize{13}{15}\bfseries}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\normalfont\fontsize{11.5}{14}\bfseries}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalfont\normalsize\bfseries\itshape}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{1.4em}{0.6em}
+\titlespacing*{\subsection}{0pt}{1.1em}{0.4em}
+\titlespacing*{\subsubsection}{0pt}{0.9em}{0.3em}
+
+% ---- tables: booktabs, wrapping columns ----
+\RequirePackage{booktabs,array,tabularx,longtable}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\renewcommand{\arraystretch}{1.15}
+
+% ---- lists, captions, code ----
+\RequirePackage{enumitem}
+\setlist{nosep,leftmargin=1.4em,topsep=0.3em}
+\RequirePackage[font=small,labelfont=bf,skip=4pt]{caption}
+\RequirePackage{float,needspace}
+\RequirePackage{listings}
+\lstset{basicstyle=\ttfamily\small,columns=fullflexible,keepspaces=true,
+  breaklines=true,frame=none,xleftmargin=1em,upquote=true,showstringspaces=false}
+
+% ---- monochrome callouts ----
+\RequirePackage{xcolor}
+\RequirePackage[framemethod=default]{mdframed}
+\newmdenv[topline=false,bottomline=false,rightline=false,linewidth=1.2pt,
+  innerleftmargin=7pt,innerrightmargin=4pt,innertopmargin=3pt,innerbottommargin=3pt,
+  skipabove=0.5em,skipbelow=0.5em]{notebox}
+\newmdenv[linewidth=0.5pt,innerleftmargin=6pt,innerrightmargin=6pt,
+  innertopmargin=4pt,innerbottommargin=4pt,skipabove=0.5em,skipbelow=0.5em]{panel}
+
+% ---- TikZ: black-on-white house style ----
+\RequirePackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,shapes.multipart,calc,fit,
+  backgrounds,trees,matrix,decorations.pathreplacing,patterns}
+\tikzset{
+  >={Stealth[length=2.2mm]},
+  every picture/.style={line width=0.6pt},
+  box/.style={draw,rectangle,align=center,inner sep=4pt,minimum height=1.6em,font=\small},
+  softbox/.style={draw,rectangle,rounded corners=2pt,align=center,inner sep=4pt,font=\small},
+  vert/.style={draw,circle,minimum size=1.7em,inner sep=1pt,font=\small},
+  goal/.style={vert,double,double distance=1pt},
+  lbl/.style={font=\footnotesize,fill=white,inner sep=1.5pt},
+  pruned/.style={dashed,gray},
+  hl/.style={line width=1.4pt},
+  memcell/.style={draw,rectangle,minimum height=1.5em,minimum width=3.6em,font=\ttfamily\footnotesize,inner sep=2pt},
+}
+
+% ---- page numbers at the foot, centred ----
+\pagestyle{plain}
+
+% ---- centred title block ----
+\newcommand{\@rtitle}{}\newcommand{\@rauthor}{}\newcommand{\@rdate}{}
+\newcommand{\reporttitle}[3]{\renewcommand{\@rtitle}{#1}\renewcommand{\@rauthor}{#2}\renewcommand{\@rdate}{#3}}
+\newcommand{\makereporttitle}{%
+  \begin{center}
+    {\fontsize{17}{20}\bfseries\@rtitle\par}\vspace{0.4em}
+    {\@rauthor\par}{\@rdate\par}
+  \end{center}\vspace{1.0em}}
+
+\RequirePackage[hidelinks]{hyperref}
+\endinput

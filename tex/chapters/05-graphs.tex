@@ -1,0 +1,463 @@
+\section{Graphs}
+% Covers lecture notes chapter 6 (Sep 29 build of the notes).
+
+% ---- helper macros for this chapter (prefix \gr) ----
+% \grBase: the running example graph G (vertices a..f) in light gray, nodes named a..f.
+\newcommand{\grBase}{%
+  \node[vert] (a) at (0,0) {$a$};
+  \node[vert] (b) at (1.6,0) {$b$};
+  \node[vert] (c) at (0.8,-1.1) {$c$};
+  \node[vert] (d) at (0.8,-2.3) {$d$};
+  \node[vert] (e) at (2.75,-0.55) {$e$};
+  \node[vert] (f) at (2.75,-1.75) {$f$};
+  \draw[gray] (a)--(b) (b)--(c) (c)--(a) (c)--(d) (e)--(f);}
+% \grStep{node A}{node B}{label}: step number on the edge between A and B
+\newcommand{\grStep}[3]{\node[font=\scriptsize,fill=white,inner sep=1pt] at ($(#1)!0.5!(#2)$) {#3};}
+
+\begin{notebox}
+\textbf{Is this on Test 1?} Graphs were lectured the week before the test. Ask your TA whether this chapter is on Test~1 before you spend your last study night on it. Either way it comes back later in the course, so the time isn't wasted.
+\end{notebox}
+
+A graph is the formal version of a dots-and-lines picture: a network of friends, cities joined by roads, web pages joined by links. The math keeps only two facts: which dots exist, and which pairs of dots are joined. Everything else about the picture is decoration.
+
+% ------------------------------------------------------------------
+\subsection{What a graph is}
+
+\begin{notebox}
+\textbf{Graph.} A graph is an ordered pair $G=(V,E)$. $V$ is a set (the \emph{vertices}, or nodes). $E$ is a set of two-member sets of vertices (the \emph{edges}).
+\end{notebox}
+
+Every piece of that definition is doing a job.
+\begin{itemize}
+\item The pair $(V,E)$ is ordered because the two parts play different roles.
+\item $V$ and $E$ are sets, so vertices and edges have no order and no repeats. You can't have two separate edges between the same two vertices.
+\item Each edge is a set, so an edge has no direction: $\{v,w\}=\{w,v\}$.
+\item Each edge has exactly \emph{two} members. An edge from $v$ to itself would be $\{v,v\}=\{v\}$, a one-member set, so it isn't allowed. No loops in a plain graph.
+\end{itemize}
+
+Position, edge length, curves and crossings are all artifacts of the drawing. Two drawings with the same vertices and the same joined pairs are the same graph.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \begin{scope}
+    \node[vert] (1) at (0,0) {1}; \node[vert] (2) at (2,0) {2};
+    \node[vert] (3) at (2,-2) {3}; \node[vert] (4) at (0,-2) {4};
+    \draw (1)--(2) (2)--(3) (3)--(4) (4)--(1) (1)--(3);
+  \end{scope}
+  \begin{scope}[xshift=5.2cm]
+    \node[vert] (1) at (1,0) {1}; \node[vert] (3) at (1,-2) {3};
+    \node[vert] (2) at (0,-1) {2}; \node[vert] (4) at (3,-1) {4};
+    \draw (1)--(2) (2)--(3) (3)--(4) (4)--(1) (1)--(3);
+  \end{scope}
+  \node[font=\footnotesize,align=left,anchor=west] at (9.6,-1) {$V=\{1,2,3,4\}$\\$E=\{\{1,2\},\{2,3\},\{3,4\},$\\$\phantom{E=\{}\{4,1\},\{1,3\}\}$};
+\end{tikzpicture}
+\caption{Two drawings, one graph. Same vertices, same five joined pairs.}
+\end{figure}
+
+\textbf{Worked example.} Which of these are graphs?
+\begin{itemize}
+\item $(\{1,2,3\},\{\{1,2\},\{2,3\}\})$. Yes.
+\item $(\{1,2\},\{\{1,2\},\{2,1\}\})$. Yes, and it has one edge, not two. $\{1,2\}$ and $\{2,1\}$ are the same set, so $E$ has one member.
+\item $(\{1,2,3\},\{\{1,1\},\{2,3\}\})$. No. $\{1,1\}=\{1\}$ isn't a two-member set.
+\item $(\{1,2\},\{(1,2)\})$. Not a graph. $(1,2)$ is an ordered pair, not a set; this is a \emph{directed} graph (see below).
+\end{itemize}
+
+% ------------------------------------------------------------------
+\subsection{Adjacency and degree}
+
+\begin{notebox}
+If $\{v,w\}\in E$, the edge \emph{joins} $v$ and $w$, and $v$ and $w$ are \emph{adjacent}; each is a \emph{neighbor} of the other.
+
+\textbf{Degree of a vertex} $v$: the number of neighbors of $v$ (the same as the number of edges that include $v$).
+
+\textbf{Degree of the graph} $G$: the \emph{maximum} degree of any vertex in $G$.
+\end{notebox}
+
+A vertex is never adjacent to itself in a plain graph, because there are no loops.
+
+Here's the running example for the rest of the chapter:
+\[V=\{a,b,c,d,e,f\},\qquad E=\{\{a,b\},\{b,c\},\{c,a\},\{c,d\},\{e,f\}\}.\]
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[x=1.35cm,y=1.35cm,dg/.style={font=\scriptsize,inner sep=1pt}]
+  \node[vert] (a) at (0,0) {$a$};
+  \node[vert] (b) at (1.6,0) {$b$};
+  \node[vert] (c) at (0.8,-1) {$c$};
+  \node[vert] (d) at (0.8,-2.1) {$d$};
+  \node[vert] (e) at (3.3,-0.5) {$e$};
+  \node[vert] (f) at (3.3,-1.7) {$f$};
+  \draw (a)--(b) (b)--(c) (c)--(a) (c)--(d) (e)--(f);
+  \node[dg,left=3pt of a] {deg 2};
+  \node[dg,right=3pt of b] {deg 2};
+  \node[dg,left=3pt of c] {deg 3};
+  \node[dg,left=3pt of d] {deg 1};
+  \node[dg,right=3pt of e] {deg 1};
+  \node[dg,right=3pt of f] {deg 1};
+\end{tikzpicture}
+\caption{The running example $G$. Degrees $2,2,3,1,1,1$, so the degree of $G$ is $3$: the largest, not the total.}
+\end{figure}
+
+\textbf{Worked example.} The neighbors of $c$ are $a$, $b$ and $d$, so $\deg(c)=3$. $a$ and $d$ aren't adjacent; there's no edge $\{a,d\}$. The degree of $G$ is $\max(2,2,3,1,1,1)=3$.
+
+\textbf{Slip.} ``Degree of the graph'' is the biggest vertex degree, not the sum. The sum is still a handy check, though it isn't something the notes define: each edge adds $1$ to the degree of each of its two ends, so the vertex degrees always add up to twice the number of edges. Here $2+2+3+1+1+1=10=2\cdot 5$. If your degrees don't add to an even number, you've miscounted.
+
+% ------------------------------------------------------------------
+\subsection{Directed graphs}
+
+Sometimes direction matters. A link from page 1 to page 2 isn't a link from page 2 to page 1. So swap the two-member sets for ordered pairs.
+
+\begin{notebox}
+\textbf{Directed graph.} $G=(V,E)$ where $V$ is a set and $E$ is a set of \emph{ordered pairs} of vertices.
+\begin{itemize}
+\item The edge $(v,w)$ goes \emph{from} $v$ \emph{to} $w$. $v$ is the \emph{tail}, $w$ is the \emph{head}. (The arrowhead sits on the head.)
+\item $w$ is a \emph{direct successor} (child) of $v$; $v$ is a \emph{direct predecessor} (parent) of $w$.
+\item Loops $(v,v)$ are allowed, and $(v,w)$ and $(w,v)$ are different edges.
+\item \textbf{Indegree} of $v$: the number of direct predecessors (edges pointing into $v$). \textbf{Outdegree}: the number of direct successors (edges pointing out of $v$).
+\end{itemize}
+\end{notebox}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[dg/.style={font=\scriptsize,inner sep=1pt,align=center}]
+  \node[vert] (1) at (0,0) {1};
+  \node[vert] (2) at (3,0) {2};
+  \node[vert] (3) at (3,-2.2) {3};
+  \node[vert] (4) at (0,-2.2) {4};
+  \draw[->] (1) -- (2);
+  \draw[->] (2) -- (3);
+  \draw[->] (3) -- (1);
+  \draw[->] (1) -- (4);
+  \draw[->] (4) -- (3);
+  \draw[->] (3) to[out=-30,in=-90,looseness=6] (3);
+  \node[dg,anchor=south] at (1.north) {in 1, out 2};
+  \node[dg,anchor=south] at (2.north) {in 1, out 1};
+  \node[dg,anchor=west] at ($(3.east)+(0.75,0.25)$) {in 3, out 2};
+  \node[dg,anchor=north] at (4.south) {in 1, out 1};
+  \node[font=\footnotesize,align=left,anchor=west] at (6.0,-1.1) {$E=\{(1,2),(2,3),(3,1),$\\$\phantom{E=\{}(1,4),(4,3),(3,3)\}$\\[3pt]edge $(2,3)$: tail $2$, head $3$\\the loop $(3,3)$ counts once in\\and once out for vertex $3$};
+\end{tikzpicture}
+\caption{A directed graph with each vertex's indegree and outdegree. Both columns add up to $6$, the number of edges, since every edge has one tail and one head.}
+\end{figure}
+
+\textbf{Worked example.} Vertex $3$ has direct predecessors $2$, $4$ and $3$ itself (from the loop), so its indegree is $3$. Its direct successors are $1$ and $3$, so its outdegree is $2$. Is $(2,1)$ an edge? No. $(1,2)$ is, and in a directed graph those are different edges.
+
+\textbf{Slip.} If your copy of the notes says the head is the starting end, it's an older build. The current notes, and the usual convention, say the edge $(v,w)$ goes from tail $v$ to head $w$.
+
+\subsubsection{Weighted graphs}
+
+When edges need a number attached (a distance, a travel time, a bandwidth), you add a weight function. A weighted directed graph is a triple $(V,E,w)$ where $w:E\to N$ assigns each edge a weight from some set $N$. Usually $N=\mathbb{R}^{+}$, the positive \emph{real} numbers. (If your copy calls $\mathbb{R}^{+}$ the positive integers, that's a slip.) Weighted graphs barely come up in this course; just know what the triple means.
+
+% ------------------------------------------------------------------
+\subsection{Walks, trails and paths}
+
+Back to plain graphs. A walk is a route you could trace with a pencil without lifting it, moving only along edges. Trails and paths add restrictions.
+
+\begin{notebox}
+\textbf{Walk} from $v$ to $w$: a sequence of edges joining a sequence of vertices $v_0,v_1,\dots,v_n$ with $v_0=v$ and $v_n=w$, where each edge joins $v_{i-1}$ and $v_i$. We usually write the vertex sequence, like $(a,b,c)$.
+
+\textbf{Trail:} a walk with no repeated edge.
+
+\textbf{Path:} a walk with no repeated vertex.
+\end{notebox}
+
+Using an edge twice means visiting one of its ends twice, so a repeated edge always brings a repeated vertex with it. The reverse fails: $(d,c,a,b,c)$ below repeats $c$ without repeating an edge. So every path is a trail, and every trail is a walk. Each word is a stricter version of the one before.
+
+Two edge cases. An edge counts as repeated even if you cross it in the opposite direction, because $\{a,b\}=\{b,a\}$. And $(v)$ on its own is the \emph{trivial path}: zero edges, a path from $v$ to itself.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[x=1.0cm,y=1.0cm]
+  \newcommand{\grPanel}[4]{%
+    \begin{scope}[xshift=#1]
+      \grBase
+      #3
+      \node[font=\small,anchor=south] at (1.35,0.35) {#2};
+      \node[font=\footnotesize,align=center,anchor=north,text width=3.5cm] at (1.35,-2.75) {#4};
+    \end{scope}}
+  \grPanel{0cm}{walk, not trail}{\draw[hl] (a)--(b)--(c)--(a);
+      \node[font=\scriptsize,fill=white,inner sep=1pt,above] at ($(a)!0.5!(b)$) {1, 4};
+      \grStep{b}{c}{2}\grStep{c}{a}{3}}{$(a,b,c,a,b)$\\edge $\{a,b\}$ used twice}
+  \grPanel{4.05cm}{trail, not path}{\draw[hl] (d)--(c)--(a)--(b)--(c);
+      \grStep{d}{c}{1}\grStep{c}{a}{2}\grStep{a}{b}{3}\grStep{b}{c}{4}}{$(d,c,a,b,c)$\\no edge repeats; vertex $c$ does}
+  \grPanel{8.1cm}{path}{\draw[hl] (d)--(c)--(b)--(a);
+      \grStep{d}{c}{1}\grStep{c}{b}{2}\grStep{b}{a}{3}}{$(d,c,b,a)$\\no repeated vertex}
+  \grPanel{12.15cm}{cycle}{\draw[hl] (a)--(b)--(c)--(a);
+      \grStep{a}{b}{1}\grStep{b}{c}{2}\grStep{c}{a}{3}}{$(a,b,c,a)$: non-empty trail,\\only first $=$ last repeats}
+\end{tikzpicture}
+\caption{The running example four times. Bold edges are the route; the numbers give the order. In the first panel, edge $\{a,b\}$ is step 1 and step 4.}
+\end{figure}
+
+To classify a vertex sequence, ask these questions in order and stop at the first ``no'':
+\begin{enumerate}
+\item Is every consecutive pair joined by an edge? If not, it isn't a walk at all.
+\item Is any edge used twice (in either direction)? If so, it's a walk but not a trail.
+\item Is any vertex visited twice? If so, it's a trail but not a path. If not, it's a path.
+\end{enumerate}
+
+\textbf{Worked example} (running example $G$).
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}llL@{}}
+\toprule
+Sequence & Verdict & Reason\\
+\midrule
+$(a,d)$ & not a walk & no edge $\{a,d\}$\\
+$(a,b,c,a,b)$ & walk, not trail & edge $\{a,b\}$ repeats\\
+$(d,c,a,b,c)$ & trail, not path & no edge repeats, but vertex $c$ does\\
+$(d,c,b,a)$ & path & no repeated vertex\\
+$(e,f)$ & path & one edge still counts\\
+$(c)$ & trivial path & zero edges\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\textbf{Slip.} At least one build of the notes has the sentence ``since every walk is a path'' in the connectivity section. It's backwards. Every \emph{path} is a walk; $(a,b,c,a,b)$ is a walk that isn't a path.
+
+% ------------------------------------------------------------------
+\subsection{Connectivity}
+
+\begin{notebox}
+\textbf{Connected vertices.} $v$ is connected to $w$ if and only if there is a path from $v$ to $w$. (A walk works just as well: if there's a walk, there's a path.)
+
+\textbf{Connected graph.} Every pair of vertices is connected.
+
+\textbf{Connected component.} A \emph{maximal} set of vertices that are all connected to each other. ``Maximal'' means you can't add another vertex and keep it connected.
+\end{notebox}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[x=1.35cm,y=1.35cm]
+  \node[vert] (a) at (0,0) {$a$};
+  \node[vert] (b) at (1.6,0) {$b$};
+  \node[vert] (c) at (0.8,-1) {$c$};
+  \node[vert] (d) at (0.8,-2.1) {$d$};
+  \node[vert] (e) at (3.3,-0.5) {$e$};
+  \node[vert] (f) at (3.3,-1.7) {$f$};
+  \draw (a)--(b) (b)--(c) (c)--(a) (c)--(d) (e)--(f);
+  \node[draw,dashed,gray,rounded corners=6pt,fit=(a)(b)(c)(d),inner sep=7pt] (K1) {};
+  \node[draw,dashed,gray,rounded corners=6pt,fit=(e)(f),inner sep=7pt] (K2) {};
+  \node[font=\scriptsize,anchor=south] at (K1.north) {component $\{a,b,c,d\}$};
+  \node[font=\scriptsize,anchor=south] at (K2.north) {component $\{e,f\}$};
+\end{tikzpicture}
+\caption{$G$ has two connected components, so $G$ is not connected: there's no path from $a$ to $e$.}
+\end{figure}
+
+\textbf{Worked example.}
+\begin{itemize}
+\item $d$ is connected to $b$: $(d,c,b)$ is a path.
+\item $a$ is not connected to $f$, so $G$ isn't a connected graph.
+\item $\{a,b\}$ is not a component. Its vertices are connected, but you can add $c$ and stay connected, so it isn't maximal.
+\item $\{a,e\}$ is not a component either; $a$ and $e$ aren't even connected.
+\item Every vertex is connected to itself by the trivial path. So an isolated vertex with no edges is a component on its own.
+\end{itemize}
+
+Side note: ``is connected to'' is reflexive, symmetric and transitive. A relation with all three is an \emph{equivalence relation}, and components are exactly its groups. In a directed graph you also need to say which kind: \emph{strongly} connected follows the arrows, \emph{weakly} connected ignores their direction.
+
+% ------------------------------------------------------------------
+\subsection{Closed walks, circuits and cycles}
+
+\begin{notebox}
+\begin{itemize}
+\item \textbf{Closed walk:} a walk whose first and last vertices are the same.
+\item \textbf{Circuit:} a non-empty trail whose first and last vertices are the same.
+\item \textbf{Cycle:} a non-empty trail where the only repeated vertex is first $=$ last.
+\end{itemize}
+``Non-empty'' means at least one edge.
+\end{notebox}
+
+Why isn't a cycle just ``a closed path''? Because a path can't repeat any vertex, and a closed route repeats its starting vertex at the end. So the definition starts from a trail and bans every other repeat.
+
+In a plain graph the shortest cycle has three edges. One edge would need a loop, which isn't allowed. Two edges would look like $(v,w,v)$, which uses $\{v,w\}$ twice, so it isn't even a trail.
+
+\textbf{Worked example} (running example $G$).
+\begin{itemize}
+\item $(a,b,c,a)$ is a cycle, and also a circuit and a closed walk.
+\item $(c,a,c)$ is a closed walk only. It repeats the edge $\{c,a\}$.
+\item $(c)$ is a closed walk (trivially), but not a circuit or a cycle: it has no edges.
+\item $(c,a,b,c,d)$ is not closed at all, since it starts at $c$ and ends at $d$.
+\end{itemize}
+For a circuit that isn't a cycle you need a vertex visited twice in the middle without reusing an edge, which takes two triangles sharing a vertex. Add $\{c,g\}$, $\{g,h\}$ and $\{h,c\}$ to $G$; then $(a,b,c,g,h,c,a)$ is a circuit but not a cycle, because $c$ repeats in the middle.
+
+% ------------------------------------------------------------------
+\subsection{Trees}
+
+\begin{notebox}
+\textbf{Tree.} A tree is a connected graph with no cycles.
+
+\textbf{Theorem (notes 6.6.1).} A graph is a tree if and only if every pair of vertices has exactly one path between them.
+\end{notebox}
+
+That's the whole official definition. Roots, parents and leaves aren't in it; they come from choosing a root afterwards. The theorem gives you a second test that's often quicker to apply: if you can find two different paths between some pair of vertices, there's a cycle hiding there.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \begin{scope}
+    \node[vert] (1) at (0,0) {1}; \node[vert] (2) at (-0.9,-1.2) {2}; \node[vert] (3) at (0.9,-1.2) {3};
+    \node[vert] (4) at (-0.9,-2.4) {4}; \node[vert] (5) at (0.9,-2.4) {5};
+    \draw (1)--(2) (1)--(3) (2)--(4) (3)--(5);
+    \node[font=\footnotesize,align=center,anchor=north] at (0,-2.95) {tree\\connected, no cycle};
+  \end{scope}
+  \begin{scope}[xshift=4.6cm]
+    \node[vert] (1) at (0,0) {1}; \node[vert] (2) at (-0.9,-1.2) {2}; \node[vert] (3) at (0.9,-1.2) {3};
+    \node[vert] (4) at (-0.9,-2.4) {4}; \node[vert] (5) at (0.9,-2.4) {5};
+    \draw (1)--(2) (1)--(3) (2)--(4) (3)--(5);
+    \draw[hl] (2)--(3);
+    \draw[hl] (1)--(2) (1)--(3);
+    \node[font=\footnotesize,align=center,anchor=north] at (0,-2.95) {not a tree\\cycle $(1,2,3,1)$};
+  \end{scope}
+  \begin{scope}[xshift=9.2cm]
+    \node[vert] (1) at (0,0) {1}; \node[vert] (2) at (-0.9,-1.2) {2}; \node[vert] (3) at (0.9,-1.2) {3};
+    \node[vert] (4) at (-0.9,-2.4) {4}; \node[vert] (5) at (0.9,-2.4) {5};
+    \draw (1)--(2) (1)--(3) (2)--(4);
+    \node[font=\footnotesize,align=center,anchor=north] at (0,-2.95) {not a tree\\$5$ is cut off};
+  \end{scope}
+\end{tikzpicture}
+\caption{Adding one edge to a tree creates a cycle (middle). Removing one disconnects it (right).}
+\end{figure}
+
+\subsubsection{Rooted trees}
+
+Pick one vertex as the root. Because there's exactly one path from each vertex to the root, everything else gets a precise meaning.
+
+\begin{notebox}
+\textbf{Rooted tree:} a tree with one vertex chosen as the root. Then:
+\begin{itemize}
+\item the \emph{parent} of $v$ is the neighbor of $v$ on the path from $v$ to the root, and $v$ is a \emph{child} of its parent;
+\item a \emph{leaf} is a vertex with no children;
+\item a \emph{branch} is a path from the root to a leaf (the whole route, not one fork);
+\item the \emph{depth} of $v$ is the number of \textbf{edges} on the path from $v$ to the root;
+\item the \emph{height} of $v$ is the number of \textbf{edges} on the longest path from $v$ that goes away from the root down to a leaf;
+\item the \emph{depth of the tree} is the largest depth of any vertex (the same as the root's height, and the length of the longest branch).
+\end{itemize}
+\end{notebox}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[x=1cm,y=1.05cm]
+  \foreach \l in {0,1,2,3} {
+    \draw[pruned] (-0.6,-\l) -- (5.0,-\l);
+    \node[font=\footnotesize,anchor=east] at (-0.7,-\l) {depth \l};
+  }
+  \node[vert,fill=white] (r) at (2.4,0) {$r$};
+  \node[vert,fill=white] (s) at (1.2,-1) {$s$};
+  \node[vert,fill=white] (t) at (3.8,-1) {$t$};
+  \node[vert,fill=white] (u) at (0.4,-2) {$u$};
+  \node[vert,fill=white] (v) at (2.0,-2) {$v$};
+  \node[vert,fill=white] (w) at (3.8,-2) {$w$};
+  \node[vert,fill=white] (x) at (2.0,-3) {$x$};
+  \draw (s)--(u) (r)--(t) (t)--(w);
+  \draw[hl] (r)--(s) (s)--(v) (v)--(x);
+  \node[font=\scriptsize,fill=white,inner sep=1pt] at ($(r)!0.5!(s)+(-0.2,0.05)$) {1};
+  \node[font=\scriptsize,fill=white,inner sep=1pt] at ($(s)!0.5!(v)+(0.22,0)$) {2};
+  \node[font=\scriptsize,fill=white,inner sep=1pt] at ($(v)!0.5!(x)+(0.22,0)$) {3};
+  \node[font=\footnotesize,align=left,anchor=west] at (5.6,-1.5) {root $r$, depth $0$\\leaves $u$, $x$, $w$\\depth of $x$ $=3$ (3 edges; 4 vertices)\\height of $s=2$, via $(s,v,x)$\\height of $t=1$; height of $r=3$\\depth of the tree $=3$};
+\end{tikzpicture}
+\caption{A rooted tree. The bold branch $(r,s,v,x)$ is the longest one. Count the edges, not the circles.}
+\end{figure}
+
+\textbf{Worked example} (the tree above).
+\begin{itemize}
+\item The parent of $v$ is $s$, since $s$ is the next vertex on the path $(v,s,r)$ to the root. The children of $s$ are $u$ and $v$.
+\item The branches are $(r,s,u)$, $(r,s,v,x)$ and $(r,t,w)$: one per leaf.
+\item depth$(v)=2$. height$(v)=1$. height$(u)=0$, like every leaf.
+\item Any vertex can be the root. Re-root at $w$ and the depth of $x$ becomes $5$, along $(x,v,s,r,t,w)$. Same tree, different rooted tree.
+\end{itemize}
+
+\textbf{Slip.} Depth and height count edges. A branch with six vertices has five edges, so it gives depth $5$, not $6$. If an example in your copy of the notes counts vertices for depth, use the edge count.
+
+\subsubsection{$n$-ary, full and complete}
+
+\begin{notebox}
+\textbf{$n$-ary tree:} every vertex has at most $n$ children (binary when $n=2$, ternary when $n=3$).
+
+\textbf{Full $n$-ary tree:} every vertex that isn't a leaf has exactly $n$ children.
+
+\textbf{Complete $n$-ary tree:} a full $n$-ary tree whose leaves all have the same depth.
+\end{notebox}
+
+So complete implies full, and full implies $n$-ary, but not the other way round. A single vertex counts as a binary tree that is full and complete: it has no non-leaf vertices to fail the rule, and its only leaf is at depth $0$.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[x=0.8cm,y=0.95cm,sv/.style={vert,minimum size=1.3em,font=\scriptsize}]
+  \begin{scope}
+    \node[sv] (0) at (0,0) {}; \node[sv] (1) at (-1,-1) {}; \node[sv] (2) at (1,-1) {};
+    \node[sv] (3) at (-1,-2) {};
+    \draw (0)--(1) (0)--(2) (1)--(3);
+    \node[draw,dashed,circle,inner sep=6pt] at (1) {};
+    \node[font=\footnotesize,align=center,anchor=north] at (0,-2.6) {binary, not full\\one node has 1 child};
+  \end{scope}
+  \begin{scope}[xshift=5.4cm]
+    \node[sv] (0) at (0,0) {}; \node[sv] (1) at (-1,-1) {}; \node[sv] (2) at (1,-1) {};
+    \node[sv] (3) at (-1.6,-2) {}; \node[sv] (4) at (-0.4,-2) {};
+    \draw (0)--(1) (0)--(2) (1)--(3) (1)--(4);
+    \node[font=\footnotesize,align=center,anchor=north] at (0,-2.6) {full, not complete\\leaves at depths 2, 2, 1};
+  \end{scope}
+  \begin{scope}[xshift=10.8cm]
+    \node[sv] (0) at (0,0) {}; \node[sv] (1) at (-1,-1) {}; \node[sv] (2) at (1,-1) {};
+    \node[sv] (3) at (-1.6,-2) {}; \node[sv] (4) at (-0.4,-2) {};
+    \node[sv] (5) at (0.4,-2) {}; \node[sv] (6) at (1.6,-2) {};
+    \draw (0)--(1) (0)--(2) (1)--(3) (1)--(4) (2)--(5) (2)--(6);
+    \node[font=\footnotesize,align=center,anchor=north] at (0,-2.6) {complete\\full, all leaves at depth 2};
+  \end{scope}
+\end{tikzpicture}
+\caption{Three binary trees, each rooted at the top vertex. The dashed ring marks the vertex that breaks ``full.''}
+\end{figure}
+
+\textbf{Slip.} The full $n$-ary definition is about non-leaf vertices. If a sentence in your copy says ``every node has exactly $n$ children,'' it means every \emph{non-leaf} node; leaves have none by definition.
+
+% ------------------------------------------------------------------
+\needspace{8\baselineskip}
+\subsection{Practice}
+
+Problems 2--4 use the graph $H$ with $V=\{p,q,r,s,t,u\}$ and $E=\{\{p,q\},\{p,r\},\{p,s\},\{q,r\},\{s,t\}\}$. Draw it first.
+
+\begin{enumerate}
+\item Which of these are graphs?\\
+(a) $(\{1,2,3\},\{\{1,2\},\{1,3\}\})$\quad (b) $(\{1,2\},\{\{1,2\},\{2,1\}\})$\quad (c) $(\{1,2\},\{\{1,3\}\})$\quad (d) $(\{1,2,3\},\{\{2,2\},\{1,3\}\})$
+\item In $H$: give the degree of every vertex and the degree of $H$. Check your work with the degree sum.
+\item In $H$, classify each sequence as not a walk, walk but not trail, trail but not path, or path. Then say which are closed walks, circuits or cycles.
+\begin{center}
+(a) $(q,p,s,t)$\quad (b) $(q,r,p,q)$\quad (c) $(r,q,p,r,q)$\quad (d) $(t,s,p,q,r,p)$\\
+(e) $(p,t)$\quad (f) $(p,s,p)$\quad (g) $(u)$
+\end{center}
+\item List the connected components of $H$. Is $\{p,q,r\}$ a component? Is $H$ connected?
+\item Let $D$ be the directed graph with $V=\{1,2,3,4\}$ and $E=\{(1,2),(2,1),(2,3),(4,4),(4,3)\}$. Give the indegree and outdegree of each vertex. What are the tail and head of $(2,3)$? Is $(1,2,3)$ a directed walk? Is $(3,2,1)$?
+\item Which of these graphs on $V=\{1,2,3,4,5\}$ are trees?\\
+(a) $E=\{\{1,2\},\{2,3\},\{3,4\},\{4,5\}\}$\quad (b) $E=\{\{1,2\},\{2,3\},\{3,1\},\{4,5\}\}$\\
+(c) $E=\{\{1,2\},\{1,3\},\{1,4\}\}$\quad (d) $E=\{\{1,2\},\{1,3\},\{1,4\},\{4,5\}\}$
+\item Root the tree with $E=\{\{a,b\},\{a,c\},\{b,d\},\{b,e\},\{c,f\},\{f,g\},\{f,h\}\}$ at $a$. List the leaves and the branches. Give depth$(g)$, height$(b)$, height$(c)$ and the depth of the tree. Is it binary? Full?
+\item Re-root the tree from problem 7 at $f$. What is the parent of $a$ now? What is the depth of $d$?
+\item True or false: (a) every trail is a path; (b) every path is a trail; (c) every cycle is a circuit; (d) every circuit is a cycle; (e) the trivial path $(v)$ is a cycle.
+\item In a plain (undirected) graph, explain why no cycle can have exactly two edges. Does the same argument work in a directed graph?
+\item Each tree below is binary and rooted at $0$. Which are full? Which are complete?\\
+(a) $\{\{0,1\},\{0,2\}\}$\quad (b) $\{\{0,1\},\{0,2\},\{2,3\},\{2,4\}\}$\quad (c) $\{\{0,1\},\{1,2\}\}$\\
+(d) $\{\{0,1\},\{0,2\},\{1,3\},\{1,4\},\{2,5\},\{2,6\}\}$
+\end{enumerate}
+
+% ------------------------------------------------------------------
+\needspace{4\baselineskip}
+\subsection{Answers}
+
+\begin{enumerate}
+\item (a) Yes. (b) Yes, with one edge: $\{1,2\}$ and $\{2,1\}$ are the same set. (c) No: $3\notin V$, so $\{1,3\}$ isn't a set of vertices of this graph. (d) No: $\{2,2\}=\{2\}$ isn't a two-member set.
+\item $\deg(p)=3$ (neighbors $q,r,s$), $\deg(q)=2$, $\deg(r)=2$, $\deg(s)=2$, $\deg(t)=1$, $\deg(u)=0$. The degree of $H$ is the maximum, $3$. Check: $3+2+2+2+1+0=10=2\cdot 5$ edges.
+\item \begin{enumerate}
+\item Path: edges $\{q,p\},\{p,s\},\{s,t\}$ all exist, no vertex repeats.
+\item Trail, not path (the vertex $q$ repeats). It's closed, non-empty, and only first $=$ last repeats, so it's a cycle, and also a circuit and a closed walk.
+\item Walk, not trail: the edge $\{r,q\}$ is used first and last (the second time as $\{q,r\}$, which is the same edge).
+\item Trail, not path: the five edges are all different, but $p$ appears twice. It isn't closed.
+\item Not a walk: there's no edge $\{p,t\}$.
+\item Walk, not trail: $\{p,s\}$ is used twice. It's a closed walk, but not a circuit or cycle.
+\item The trivial path. It's also a trivial closed walk, but not a circuit or cycle, since it has no edges.
+\end{enumerate}
+\item The components are $\{p,q,r,s,t\}$ and $\{u\}$. $\{p,q,r\}$ is not a component: it's connected, but you can add $s$ and still be connected, so it isn't maximal. $H$ isn't connected; there's no path from $u$ to anything else.
+\item Indegree / outdegree: vertex $1$: $1/1$; vertex $2$: $1/2$; vertex $3$: $2/0$; vertex $4$: $1/2$ (the loop $(4,4)$ counts once each way). Both columns add up to $5$, the number of edges. $(2,3)$ has tail $2$ and head $3$. $(1,2,3)$ is a directed walk, since $(1,2)$ and $(2,3)$ are edges. $(3,2,1)$ isn't: $(3,2)$ is not an edge, and in a directed graph you can't follow $(2,3)$ backwards.
+\item (a) Tree: a single line, connected, no cycle. (b) Not a tree: $(1,2,3,1)$ is a cycle, and it's also disconnected. (c) Not a tree: vertex $5$ has no edges, so the graph isn't connected. (d) Tree: connected, and with no cycle.
+\item Children: $a\to b,c$; $b\to d,e$; $c\to f$; $f\to g,h$. Leaves: $d,e,g,h$. Branches: $(a,b,d)$, $(a,b,e)$, $(a,c,f,g)$, $(a,c,f,h)$. depth$(g)=3$ (edges $ac$, $cf$, $fg$). height$(b)=1$. height$(c)=2$, via $(c,f,g)$. The depth of the tree is $3$. Binary: yes, no vertex has more than $2$ children. Full: no, $c$ isn't a leaf and has only one child.
+\item The path from $a$ to $f$ is $(a,c,f)$, so the parent of $a$ is $c$. The path from $d$ to $f$ is $(d,b,a,c,f)$, four edges, so depth$(d)=4$.
+\item (a) False: $(d,c,a,b,c)$ in the running example $G$ is a trail but not a path. (b) True: a repeated edge would force a repeated vertex. (c) True: a cycle is a non-empty trail with first $=$ last, which is exactly what a circuit needs. (d) False: a circuit can revisit a vertex in the middle. (e) False: a cycle must have at least one edge.
+\item A two-edge closed walk has the form $(v,w,v)$. Both steps use the edge $\{v,w\}$, so it repeats an edge and isn't a trail, let alone a cycle. In a directed graph the argument breaks: $(v,w)$ and $(w,v)$ are different edges, so $(v,w,v)$ repeats no edge. So a directed graph can have a two-edge cycle, and even a one-edge one from a loop.
+\item (a) Full and complete: the root has $2$ children, and both leaves are at depth $1$. (b) Full, not complete: every non-leaf has $2$ children, but the leaves are at depths $1$, $2$ and $2$. (c) Neither: vertices $0$ and $1$ each have just one child. (d) Full and complete: all four leaves are at depth $2$.
+\end{enumerate}

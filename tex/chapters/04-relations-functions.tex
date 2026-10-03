@@ -1,0 +1,433 @@
+\section{Relations and functions}
+% Covers lecture notes sections 4.1--4.4.1 and 5.0--5.4 (Sep 29 build of the notes).
+
+% ---- helper macros for this chapter (prefix \rel) ----
+% \relPanel{x}{y}{domain items}{#domain}{codomain items}{#codomain}{title}{caption}
+% Draws two ellipses with dots; names the dots d1,d2,... and c1,c2,... so you can draw arrows after.
+\newcommand{\relPanel}[8]{%
+  \begin{scope}[shift={(#1,#2)}]
+    \node[font=\small] at (1.3,1.55) {#7};
+    \draw (0,0) ellipse (0.75 and 1.2);
+    \draw (2.6,0) ellipse (0.75 and 1.2);
+    \node[font=\scriptsize] at (0,-1.42) {domain};
+    \node[font=\scriptsize] at (2.6,-1.42) {codomain};
+    \foreach \k [count=\j] in {#3} {\node[circle,fill,inner sep=1.3pt] (d\j) at (0.3,{((#4+1)/2-\j)*0.62}) {}; \node[font=\scriptsize,inner sep=1pt,left=4pt of d\j] {$\k$};}
+    \foreach \k [count=\j] in {#5} {\node[circle,fill,inner sep=1.3pt] (c\j) at (2.3,{((#6+1)/2-\j)*0.62}) {}; \node[font=\scriptsize,inner sep=1pt,right=4pt of c\j] {$\k$};}
+    \node[font=\footnotesize,align=center,text width=5cm,anchor=north] at (1.3,-1.65) {#8};
+  \end{scope}}
+% \relMiss{node}: dashed ring marking the input or output that breaks a property
+\newcommand{\relMiss}[1]{\node[draw,dashed,circle,inner sep=2.5pt] at (#1) {};}
+
+So far every object has been a set or a proposition. This chapter adds one new object, the ordered pair, and then builds two ideas on top of it. A relation is a set of pairs. A function is a relation that behaves well enough to be read as ``input goes in, output comes out.'' Almost every question in this chapter comes down to looking at a set of pairs and checking a rule.
+
+% ------------------------------------------------------------------
+\subsection{Ordered pairs and tuples}
+
+Sets forget order. $\{5,-3\}$ and $\{-3,5\}$ are the same set, so a set can't tell the point five right and three down apart from the point three left and five up. Sets also forget repeats, so the point $(7,7)$ would collapse to $\{7\}$. You need an object that keeps both.
+
+\begin{notebox}
+\textbf{Ordered pair.} $(a,b)$ has a first component $a$ and a second component $b$. Order matters and repeats are allowed: $(1,2)\neq(2,1)$, and $(4,4)$ is a perfectly good pair.
+
+\textbf{$n$-tuple.} The same idea with $n$ slots: pair (or couple), triple, quadruple, \dots, $n$-tuple. Two tuples are equal only when they have the same length and match slot by slot.
+\end{notebox}
+
+Round parentheses mean ``tuple.'' Curly braces mean ``set.'' Mixing them up changes the object, so read the brackets before anything else. The notes also mention sequences: ordered like tuples, but with no fixed length, and they can even be infinite.
+
+\textbf{Worked example.} True or false?
+\begin{itemize}
+\item $(3,4)=\{3,4\}$. False. One is a pair, the other is a set. They aren't even the same kind of thing.
+\item $(2,2,5)=(2,5)$. False. A triple is never equal to a pair.
+\item $\{(1,2),(2,1)\}=\{(2,1),(1,2)\}$. True. Both sets have the same two members; the order you list members of a set in never matters.
+\item $\{(1,2),(3,4)\}=\{(2,1),(3,4)\}$. False. $(1,2)$ is a member of the left set but not the right one. Order inside each pair still matters.
+\end{itemize}
+
+% ------------------------------------------------------------------
+\subsection{The Cartesian product}
+
+Given two sets, you often want every pair you could build by taking the first component from one set and the second from the other. That collection has a name.
+
+\begin{notebox}
+\textbf{Cartesian product.} $X\times Y=\{(x,y)\mid x\in X\land y\in Y\}$.
+
+\textbf{Size.} For finite sets, $|A\times B|=|A|\cdot|B|$.
+\end{notebox}
+
+Picture it as a grid. Put the members of the first set along the bottom and the members of the second set up the side. Every crossing point is one pair.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[x=1.5cm,y=0.95cm]
+  \draw[->] (-0.3,-0.4) -- (2.6,-0.4) node[right,font=\footnotesize] {first component from $A$};
+  \draw[->] (-0.3,-0.4) -- (-0.3,2.7) node[above,font=\footnotesize] {second from $B$};
+  \foreach \a [count=\i] in {p,q} \node[font=\small] at (\i,-0.75) {$\a$};
+  \foreach \b [count=\j] in {0,1,2} \node[font=\small] at (-0.6,\j-0.5) {$\b$};
+  \foreach \a [count=\i] in {p,q} \foreach \b [count=\j] in {0,1,2} {
+    \node[circle,draw,inner sep=2pt] (g\i\j) at (\i,\j-0.5) {};
+    \node[font=\scriptsize,anchor=west] at ($(g\i\j)+(0.1,0)$) {$(\a,\b)$};
+  }
+  \foreach \i/\j in {1/1,1/3,2/2} \node[circle,fill,inner sep=2pt] at (g\i\j) {};
+  \node[font=\footnotesize,align=left,anchor=west] at (3.3,1.0) {$A=\{p,q\}$, $B=\{0,1,2\}$\\[2pt]$|A\times B|=2\cdot 3=6$ crossing points\\[2pt]Filled dots: the relation\\$\{(p,0),(p,2),(q,1)\}$, one of\\the $2^6=64$ subsets of the grid};
+\end{tikzpicture}
+\caption{$A\times B$ as a grid. Every relation from $A$ to $B$ is some choice of dots from this grid, which is where the next section starts.}
+\end{figure}
+
+\textbf{Worked example.} Let $A=\{p,q\}$ and $B=\{0,1,2\}$.
+\begin{itemize}
+\item $A\times B=\{(p,0),(p,1),(p,2),(q,0),(q,1),(q,2)\}$, six pairs.
+\item Is $(0,p)\in A\times B$? No. The first component has to come from $A$, and $0\notin A$. But $(0,p)\in B\times A$. The $\times$ sign looks symmetric, yet $A\times B\neq B\times A$ here.
+\item $|A\times A|=4$: the pairs $(p,p),(p,q),(q,p),(q,q)$. Repeats are allowed in a pair, so $(p,p)$ counts.
+\item $|A\times\emptyset|=2\cdot 0=0$. There's nothing to put in the second slot, so there are no pairs at all.
+\end{itemize}
+
+\textbf{Slips.} If your copy of the notes writes the set-builder as $\{(x,y)\mid x\in X\land x\in Y\}$, that's a typo. The second condition is $y\in Y$. And count distinct members before you multiply: $\{1,1,2\}$ has two members, not three.
+
+% ------------------------------------------------------------------
+\subsection{Relations}
+
+``24 is a multiple of 6'' is true, ``6 is a multiple of 24'' is false. A relation is about which pairs of things are connected, and often the direction matters. So the formal version is simply a set of ordered pairs.
+
+\begin{notebox}
+\textbf{Relation.} A relation from $A$ to $B$ is a set of ordered pairs whose first components are all in $A$ and whose second components are all in $B$. Equivalently, it's any subset of $A\times B$. $A$ is the \emph{domain}, $B$ is the \emph{codomain}. If both are the same set $A$, it's a relation \emph{on} $A$.
+\end{notebox}
+
+There are four interchangeable ways to say that a relation $R$ connects $2$ to $3$:
+\begin{itemize}
+\item set membership: $(2,3)\in R$;
+\item English: ``$R$ relates $2$ to $3$'';
+\item prefix: $R(2,3)$;
+\item infix: $2\,R\,3$ (the usual style when the relation is a symbol, like $2<3$).
+\end{itemize}
+All four mean the same thing, and ``$R(2,3)$ is false'' means $(2,3)\notin R$.
+
+You can define a relation by listing its pairs, by drawing it, or with set-builder notation. Drawings come in two styles. With separate domain and codomain, you draw two columns and put an arrow from $x$ to $y$ for every pair $(x,y)$. For a relation on a single set, you can draw each member once and let arrows run between them (an arrow from a node back to itself is the pair $(x,x)$).
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \relPanel{0}{0}{1,2,3,4}{4}{x,y,z}{3}{$R$ from $A$ to $B$}{$R=\{(1,y),(2,x),(2,z),(4,z)\}$\\$3$ is related to nothing; that's allowed}
+  \draw[->] (d1) -- (c2); \draw[->] (d2) -- (c1); \draw[->] (d2) -- (c3); \draw[->] (d4) -- (c3);
+  \begin{scope}[xshift=7.2cm,yshift=0.2cm]
+    \node[font=\small] at (1.1,1.35) {$S$ on $\{1,2,3\}$};
+    \node[vert] (s1) at (0,0) {1}; \node[vert] (s2) at (2.2,0) {2}; \node[vert] (s3) at (1.1,-1.4) {3};
+    \draw[->] (s1) -- (s2);
+    \draw[->] (s2) -- (s3);
+    \draw[->] (s3) to[out=-60,in=-120,looseness=6] (s3);
+    \node[font=\footnotesize,align=center,anchor=north] at (1.1,-2.25) {$S=\{(1,2),(2,3),(3,3)\}$\\one drawing of each member};
+  \end{scope}
+\end{tikzpicture}
+\caption{Two ways to draw a relation. Each arrow is exactly one pair. Nothing else in the picture (positions, lengths, crossings) carries any meaning.}
+\end{figure}
+
+For big or infinite relations you'll use set-builder notation. Let $V=\{(s,n)\mid n \text{ is the number of \texttt{a}'s in } s\}$, a relation from strings to $\mathbb{N}$. To decide whether $V(\texttt{"banana"},3)$, you just ask whether \texttt{"banana"} has three \texttt{a}'s. It does, so yes. $V(\texttt{"banana"},2)$ is false.
+
+\textbf{Worked example.} On $\mathbb{Z}$, let $T=\{(n,m)\mid n-m=3\}$. Is $T(5,2)$? $5-2=3$, so yes. Is $T(2,5)$? $2-5=-3\neq 3$, so no. Is $(0,-3)\in T$? $0-(-3)=3$, so yes.
+
+A side note from the notes: something like $\{(n,m)\mid n \text{ and } m \text{ are both prime}\}$ is technically a relation and gets full credit on a test, but it doesn't say anything about how $n$ and $m$ relate. The notes call these ``two properties in a trench coat.'' Don't study with them; they only teach you the edge cases.
+
+% ------------------------------------------------------------------
+\subsection{Edge-case relations}
+
+Three relations exist for any domain and codomain, and you should know them by name.
+
+\begin{notebox}
+\textbf{Empty relation:} $\emptyset$. Relates nothing to anything.\\
+\textbf{Identity relation} on $A$: $\{(x,y)\mid x=y\}$. Relates each member to itself and to nothing else.\\
+\textbf{Total relation} from $A$ to $B$: $A\times B$ itself. Relates everything to everything, and it's the biggest possible relation from $A$ to $B$.
+\end{notebox}
+
+\textbf{Worked example.} Take $A=\{1,2,3\}$. The empty relation on $A$ has $0$ pairs. The identity relation has three,
+\[\{(1,1),(2,2),(3,3)\},\]
+and the total relation $A\times A$ has $9$ pairs. Since a relation from $A$ to $B$ is just a subset of $A\times B$, there are $2^{|A\times B|}$ of them in all; here that's $2^9=512$ relations on $A$.
+
+If a question asks for a relation where nothing is related, say ``the empty relation'' or write $\emptyset$. Don't be sneaky with something like $\{(x,y)\mid x<y\land x>y\}$. It's the same set, just harder to read.
+
+% ------------------------------------------------------------------
+\subsection{Symmetry}
+
+Some relations don't care which slot is first. ``$n+m$ is even'' gives the same answer whichever number you call $n$. That's symmetry.
+
+\begin{notebox}
+\textbf{Symmetric.} A relation $R$ on a set $A$ is symmetric if and only if for every $x,y\in A$, if $R(x,y)$ then $R(y,x)$.
+\end{notebox}
+
+Read the definition as a claim about \emph{every} pair. That tells you what each answer costs:
+\begin{itemize}
+\item \textbf{To show it's not symmetric:} give one pair with $R(x,y)$ true and $R(y,x)$ false. One is enough. Don't argue that every pair fails.
+\item \textbf{To show it is symmetric:} for a small finite relation, check that every pair has its mirror. For an infinite one, give a reason that works for any $x$ and $y$.
+\end{itemize}
+
+In an arrow drawing, a symmetric relation is one where every arrow has a partner going back. A loop $(x,x)$ is its own partner.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \begin{scope}
+    \node[vert] (1) at (0,0) {1}; \node[vert] (2) at (1.8,0) {2}; \node[vert] (3) at (3.6,0) {3};
+    \draw[->] (1) to[bend left=25] (2);
+    \draw[->] (2) to[bend left=25] (1);
+    \draw[->] (3) to[out=60,in=120,looseness=6] (3);
+    \node[font=\footnotesize,align=center] at (1.8,-1.1) {$\{(1,2),(2,1),(3,3)\}$: symmetric\\every arrow has its mirror};
+  \end{scope}
+  \begin{scope}[xshift=7.4cm]
+    \node[vert] (1) at (0,0) {1}; \node[vert] (2) at (1.8,0) {2}; \node[vert] (3) at (3.6,0) {3};
+    \draw[->,hl] (1) -- (2);
+    \draw[->] (2) to[bend left=25] (3);
+    \draw[->] (3) to[bend left=25] (2);
+    \node[font=\footnotesize,align=center] at (1.8,-1.1) {$\{(1,2),(2,3),(3,2)\}$: not symmetric\\the bold $(1,2)$ has no $(2,1)$};
+  \end{scope}
+\end{tikzpicture}
+\caption{On the right, $2$ and $3$ point at each other, and that proves nothing. The single bold arrow without a partner is what settles the question.}
+\end{figure}
+
+\textbf{Worked examples.}
+\begin{itemize}
+\item $\{(n,m)\mid n\cdot m>0\}$ on $\mathbb{Z}$ is symmetric. If $n\cdot m>0$, then $m\cdot n>0$ too, because $m\cdot n=n\cdot m$.
+\item $T=\{(n,m)\mid n-m=3\}$ on $\mathbb{Z}$ is not symmetric. $T(5,2)$ holds, but $T(2,5)$ doesn't, since $2-5=-3$.
+\item $\{(s,t)\mid s \text{ is a prefix of } t\}$ on strings is not symmetric. \texttt{"ab"} is a prefix of \texttt{"abc"}, but \texttt{"abc"} isn't a prefix of \texttt{"ab"}.
+\item The identity relation on any set is symmetric. Its only pairs are $(x,x)$, and each one is its own mirror.
+\item The empty relation is symmetric. The condition ``if $R(x,y)$ then \dots'' never has a true premise, so it's vacuously true.
+\end{itemize}
+
+\textbf{Slip.} Finding one pair that \emph{does} mirror, say $R(\texttt{"tab"},\texttt{"bat"})$ and $R(\texttt{"bat"},\texttt{"tab"})$, does not show the relation is symmetric. That's checking one case of a ``for every'' claim. One unmirrored pair disproves symmetry; one mirrored pair proves nothing.
+
+\textbf{Coming next: reflexive and transitive.} The notes define two more properties right after symmetry. \emph{Reflexive}: for every $x\in A$, $R(x,x)$ (every node has a loop). \emph{Transitive}: for every $x,y,z\in A$, if $R(x,y)$ and $R(y,z)$, then $R(x,z)$; watch the case where $x$ and $z$ are the same. Read them so the words aren't new later, but check with your TA before treating them as Test~1 material.
+
+% ------------------------------------------------------------------
+\subsection{Functions: uniqueness and totality}
+
+You already know functions as ``input in, output out.'' Formally a function is a relation, so it's a set of pairs, with the first component as the input and the second as the output. For that reading to work, each input needs exactly one output. The notes split ``exactly one'' into ``at most one'' and ``at least one,'' and give each half a name.
+
+\begin{notebox}
+\textbf{Function.} A function from $A$ to $B$ is a relation from $A$ to $B$ that satisfies
+\begin{itemize}
+\item \textbf{(Uniqueness)} no $x\in A$ is related to two different members of $B$, and
+\item \textbf{(Totality)} every $x\in A$ is related to some $y\in B$.
+\end{itemize}
+The one output for $x$ is written $f(x)$. We say $f$ \emph{maps} $x$ to $f(x)$. Signature: $f:A\to B$. If $A=B$, $f$ is a function \emph{on} $A$.
+\end{notebox}
+
+\textbf{Ways to define one.} An English description, a formula like $f(x)=x^2+1$, a table of inputs and outputs, a set-list of pairs, an arrow diagram, or set-builder notation. They all pin down the same thing: which output goes with each input. Always say the domain and codomain too.
+
+\textbf{Same pairs means same function.} A function is its set of pairs, not its formula. $f(n)=n^2-1$ and $g(n)=(n-1)(n+1)$ on $\mathbb{Z}$ are the same function, because they send every input to the same output. It's the same reason $\{1,2\}$ and $\{2,1\}$ are the same set.
+
+\textbf{A formula isn't automatically a function.} You have to check that the output exists for every input and actually lands in the codomain. Take $h:\mathbb{Z}\to\mathbb{Z}$ with $h(n)=n/2$. Then $h(3)=1.5$, which isn't in $\mathbb{Z}$. So $h$ fails totality as written; $h(3)$ is undefined.
+
+% ------------------------------------------------------------------
+\subsection{Partial functions}
+
+Failing totality is a much milder problem than failing uniqueness. You can still talk about inputs and outputs; some inputs just don't have one. So it gets its own name.
+
+\begin{notebox}
+\textbf{Partial function.} A relation that satisfies uniqueness (totality optional).
+
+Every relation lands in exactly one of three buckets:
+\begin{enumerate}
+\item not a partial function (fails uniqueness);
+\item a partial function but not a total function (uniqueness holds, totality fails);
+\item a (total) function (both hold).
+\end{enumerate}
+\end{notebox}
+
+The word ``partial'' is the trap. In everyday English it means ``not total.'' Here it means ``not \emph{necessarily} total.'' So every function is also a partial function, since it passes uniqueness. ``Total function'' is just ``function'' said with emphasis.
+
+Programming functions fit here naturally. A function that throws an error or loops forever on some input has no output there, so it describes a partial function.
+
+\textbf{Worked example.} $d:\mathbb{R}\times\mathbb{R}\to\mathbb{R}$ with $d(x,y)=x/y$ is a partial function. Uniqueness holds (division gives one answer), but $d(1,0)$ is undefined, so it isn't total. Likewise ``the last character of $s$'' on strings is partial, because the empty string has no last character.
+
+The five arrow diagrams below cover every case you'll need. Read them with one rule: uniqueness and totality are about arrows \emph{leaving} inputs; injective and onto (next section) are about arrows \emph{arriving} at outputs.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \relPanel{0}{0}{1,2,3}{3}{a,b,c,d}{4}{not a partial function}{$1$ has two outputs:\\uniqueness fails}
+  \draw[->] (d1) -- (c1); \draw[->,hl] (d1) -- (c2); \draw[->] (d2) -- (c3); \draw[->] (d3) -- (c4);
+  \relPanel{5.6}{0}{1,2,3}{3}{a,b,c,d}{4}{partial, not total}{$3$ has no output:\\totality fails}
+  \draw[->] (d1) -- (c1); \draw[->] (d2) -- (c3); \relMiss{d3}
+  \relPanel{11.2}{0}{1,2,3}{3}{a,b,c}{3}{bijection}{every output reached\\exactly once}
+  \draw[->] (d1) -- (c1); \draw[->] (d2) -- (c2); \draw[->] (d3) -- (c3);
+  \relPanel{2.8}{-4.6}{1,2,3}{3}{a,b,c,d}{4}{injective, not onto}{no output reached twice,\\but $d$ is never reached}
+  \draw[->] (d1) -- (c1); \draw[->] (d2) -- (c2); \draw[->] (d3) -- (c3); \relMiss{c4}
+  \relPanel{8.4}{-4.6}{-1,0,1}{3}{0,1}{2}{onto, not injective}{$n\mapsto|n|$: both outputs reached,\\but $-1$ and $1$ collide}
+  \draw[->,hl] (d1) -- (c2); \draw[->] (d2) -- (c1); \draw[->,hl] (d3) -- (c2);
+\end{tikzpicture}
+\caption{The function zoo. Dashed rings mark the input or output that breaks a property; bold arrows mark the collision.}
+\end{figure}
+
+% ------------------------------------------------------------------
+\subsection{Injective, onto, bijection}
+
+Play the backwards game: someone tells you an output, and you try to name the input. It can fail in two ways. There might be \emph{several} inputs with that output, so you can't say which one it was. Or there might be \emph{no} input with that output. Injective rules out the first failure, onto rules out the second.
+
+\begin{notebox}
+\textbf{Injective (one-to-one).} A function or partial function $f:A\to B$ is injective if and only if for every $x,y\in A$, if $f(x)=f(y)$, then $x=y$.
+
+\textbf{Onto (surjective).} $f:A\to B$ is onto if and only if for every $y\in B$ there is an $x\in A$ with $f(x)=y$. Every member of the \emph{declared} codomain is an actual output.
+
+\textbf{Bijection.} Injective and onto.
+\end{notebox}
+
+The injective definition reads backwards at first. It says: if two outputs match, the inputs were the same all along. The intuitive version is the contrapositive: you can't have two different inputs with the same output. Use the intuitive one to hunt for a counterexample, and the official one when you write the argument.
+
+Each property tells you what an answer has to contain:
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}lLL@{}}
+\toprule
+ & To show it holds & To show it fails\\
+\midrule
+injective & explain why $f(x)=f(y)$ forces $x=y$ & two different inputs with the same output\\
+onto & for an arbitrary $y$ in the codomain, show how to find an input & one $y$ in the codomain, plus why nothing maps to it\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\textbf{Worked examples.}
+\begin{itemize}
+\item $f:\mathbb{N}\to\mathbb{N}$, $f(n)=n+2$. Injective: if $n+2=m+2$ then $n=m$. Not onto: $0$ is in the codomain, but $n+2=0$ needs $n=-2\notin\mathbb{N}$.
+\item $g:\mathbb{Z}\to\mathbb{Z}$, $g(n)=n+2$. Same rule, new domain and codomain. Still injective, and now onto: for any $y\in\mathbb{Z}$, the input $y-2$ is in $\mathbb{Z}$ and $g(y-2)=y$. So $g$ is a bijection.
+\item $a:\mathbb{Z}\to\mathbb{N}$, $a(n)=|n|$. Onto: for any $y\in\mathbb{N}$, $a(y)=y$. Not injective: $a(-1)=a(1)=1$.
+\item $t:\text{Str}\to\text{Str}$, $t(s)=s+s$ (concatenate $s$ with itself). Injective: if $s+s=u+u$, the first half of each string is the same, so $s=u$. Not onto: \texttt{"a"} has odd length, and every output has even length.
+\end{itemize}
+
+\subsubsection{The four-way contrast}
+
+This is the most common mix-up in the chapter. Uniqueness sounds like injective, and totality sounds like onto. They aren't the same, and the cleanest way to see the difference is to ask which end of the arrow you're counting.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[dt/.style={circle,fill,inner sep=1.2pt}]
+  \node[font=\footnotesize] at (3.0,1.15) {at most one};
+  \node[font=\footnotesize] at (7.6,1.15) {at least one};
+  \node[font=\footnotesize,align=right,anchor=east] at (0.6,0) {arrows \emph{leaving}\\each input};
+  \node[font=\footnotesize,align=right,anchor=east] at (0.6,-3.0) {arrows \emph{arriving}\\at each output};
+  \foreach \cx/\cy in {3.0/0,7.6/0,3.0/-3.0,7.6/-3.0} \draw[gray] (\cx-2.1,\cy-1.35) rectangle (\cx+2.1,\cy+0.85);
+  % uniqueness fails
+  \begin{scope}[shift={(2.0,0.35)}]
+    \node[dt] (i1) at (0,0) {}; \node[dt] (o1) at (2,0.3) {}; \node[dt] (o2) at (2,-0.4) {};
+    \draw[->,hl] (i1) -- (o1); \draw[->,hl] (i1) -- (o2);
+  \end{scope}
+  \node[font=\footnotesize,align=center] at (3.0,-0.85) {\textbf{uniqueness}: one input,\\never two outputs};
+  % totality fails
+  \begin{scope}[shift={(6.6,0.35)}]
+    \node[dt] (i1) at (0,0.3) {}; \node[dt] (i2) at (0,-0.4) {}; \node[dt] (o1) at (2,0.3) {};
+    \draw[->] (i1) -- (o1); \relMiss{i2}
+  \end{scope}
+  \node[font=\footnotesize,align=center] at (7.6,-0.85) {\textbf{totality}: every input\\has some output};
+  % injective fails
+  \begin{scope}[shift={(2.0,-2.65)}]
+    \node[dt] (i1) at (0,0.3) {}; \node[dt] (i2) at (0,-0.4) {}; \node[dt] (o1) at (2,0) {};
+    \draw[->,hl] (i1) -- (o1); \draw[->,hl] (i2) -- (o1);
+  \end{scope}
+  \node[font=\footnotesize,align=center] at (3.0,-3.85) {\textbf{injective}: one output,\\never two inputs};
+  % onto fails
+  \begin{scope}[shift={(6.6,-2.65)}]
+    \node[dt] (i1) at (0,0.3) {}; \node[dt] (o1) at (2,0.3) {}; \node[dt] (o2) at (2,-0.4) {};
+    \draw[->] (i1) -- (o1); \relMiss{o2}
+  \end{scope}
+  \node[font=\footnotesize,align=center] at (7.6,-3.85) {\textbf{onto}: every codomain\\member gets an arrow};
+\end{tikzpicture}
+\caption{Each cell shows what a \emph{failure} of that property looks like. Top row: the two parts of being a function. Bottom row: the two extra properties a function may or may not have.}
+\end{figure}
+
+\begin{itemize}
+\item uniqueness: you can't have one input with several outputs;
+\item injective: you can't have one output with several inputs;
+\item totality: every member of the domain has some output;
+\item onto: every member of the codomain comes from some input.
+\end{itemize}
+
+\subsubsection{The declared sets decide}
+
+The rule alone doesn't settle injective or onto. Onto depends on the codomain you declare, and injective depends on the domain.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+  \relPanel{0}{0}{0,1,2,3}{4}{0,1}{2}{codomain $\{0,1\}$}{onto: $0$ and $1$ both reached}
+  \draw[->] (d1) -- (c1); \draw[->] (d2) -- (c1); \draw[->] (d3) -- (c2); \draw[->] (d4) -- (c2);
+  \relPanel{6.4}{0}{0,1,2,3}{4}{0,1,2}{3}{codomain $\{0,1,2\}$}{not onto: nothing reaches $2$}
+  \draw[->] (d1) -- (c1); \draw[->] (d2) -- (c1); \draw[->] (d3) -- (c2); \draw[->] (d4) -- (c2); \relMiss{c3}
+\end{tikzpicture}
+\caption{The same rule, $n\mapsto\lfloor n/2\rfloor$ on $\{0,1,2,3\}$, with two declared codomains. The arrows are identical; only the codomain changed, and with it the answer to ``onto?''}
+\end{figure}
+
+\begin{itemize}
+\item $\lfloor x\rfloor$ as a function $\mathbb{R}\to\mathbb{R}$ is not onto ($0.5$ is never an output). As $\mathbb{R}\to\mathbb{Z}$, it is onto: $\lfloor y\rfloor=y$ for any integer $y$.
+\item $n\mapsto n^2$ on $\mathbb{Z}$ is not injective ($(-2)^2=2^2$). On $\mathbb{N}$, it is injective, because there are no negative inputs left to collide with.
+\end{itemize}
+
+% ------------------------------------------------------------------
+\subsection{Functions on sets}
+
+Functions can take sets as inputs or give sets as outputs. Read the signature first, because it tells you what kind of thing goes in and comes out.
+\begin{itemize}
+\item $k:\mathcal{P}(X)\to Y$ takes a \emph{set} of members of $X$ and returns one member of $Y$.
+\item $m:X\to\mathcal{P}(Y)$ takes one member of $X$ and returns a \emph{set} of members of $Y$.
+\end{itemize}
+
+\textbf{Worked example (set in, number out).} $k:\mathcal{P}(\{1,2,3\})\to\mathbb{N}$, $k(S)=|S|$.
+\begin{itemize}
+\item Total: every subset has a size, including $k(\emptyset)=0$.
+\item Not injective: $k(\{1\})=k(\{2\})=1$.
+\item Not onto $\mathbb{N}$: no subset of a three-member set has size $4$. With codomain $\{0,1,2,3\}$ instead, it is onto.
+\end{itemize}
+
+\textbf{Worked example (average).} $\text{avg}:\mathcal{P}(\mathbb{R})\to\mathbb{R}$, the average of the numbers in the set. It's only partial: $\text{avg}(\emptyset)$ is undefined, and so is the average of an infinite set like $\mathbb{Z}$. It isn't injective, since $\text{avg}(\{0,4\})=2=\text{avg}(\{2\})$. It is onto: for any $y$, $\text{avg}(\{y\})=y$.
+
+\textbf{Worked example (number in, set out).} $m:\mathbb{N}\to\mathcal{P}(\mathbb{N})$, $m(n)=\{n,n+1\}$. So $m(4)=\{4,5\}$. It's injective: the smallest member of $m(n)$ is $n$, so different inputs give sets with different smallest members. It isn't onto: $m$ never outputs $\{7\}$, or $\emptyset$, or any set without exactly two members.
+
+\textbf{Computing an output set.} Let $c:\mathcal{P}(\mathbb{Z})\to\mathcal{P}(\mathbb{Z})$ be $c(A)=\{s+t\mid s,t\in A\}$. What's $c(\{1,2,5\})$? Go through every ordered pair $(s,t)$ from $A$, \emph{including} $s=t$. That's $3\cdot 3=9$ pairs:
+\[
+1{+}1=2,\ 1{+}2=3,\ 1{+}5=6,\ 2{+}1=3,\ 2{+}2=4,\ 2{+}5=7,\ 5{+}1=6,\ 5{+}2=7,\ 5{+}5=10.
+\]
+Duplicates collapse in a set, so $c(\{1,2,5\})=\{2,3,4,6,7,10\}$, six members. The usual mistakes are skipping $s=t$ (losing $2$, $4$ and $10$) and keeping the repeats.
+
+% ------------------------------------------------------------------
+\needspace{8\baselineskip}
+\subsection{Practice}
+
+Answers follow. Work each one on paper first.
+
+\begin{enumerate}
+\item Let $A=\{x,y\}$ and $B=\{1,2,3\}$. List $A\times B$. What is $|B\times A|$? Is $(1,x)\in A\times B$?
+\item With $A$ and $B$ as in problem 1, how many different relations from $A$ to $B$ are there?
+\item On $\{1,2,3,4\}$, is $R=\{(1,3),(3,1),(2,4),(4,4)\}$ symmetric? Justify with the right kind of evidence.
+\item Is the empty relation on $\{1,2,3\}$ symmetric? Is the total relation?
+\item On $\mathbb{Z}$, is $P=\{(n,m)\mid n+m=7\}$ symmetric? Is $Q=\{(n,m)\mid n-m=7\}$?
+\item Each of these is a relation from $\{1,2,3\}$ to $\{a,b,c\}$. Put it in one of the three buckets (not a partial function, partial but not total, total function). For the total functions, say whether they're injective and whether they're onto.
+\begin{enumerate}
+\item $\{(1,a),(2,b),(3,b)\}$
+\item $\{(1,c),(3,a)\}$
+\item $\{(1,a),(1,b),(2,c),(3,c)\}$
+\item $\{(1,b),(2,c),(3,a)\}$
+\end{enumerate}
+\item $f:\mathbb{N}\to\mathbb{N}$, $f(n)=3n$. Injective? Onto?
+\item $g:\mathbb{Z}\to\mathbb{Z}$, $g(n)=n^2$. Injective? Onto? Then answer both again for the same rule as $h:\mathbb{N}\to\mathbb{N}$.
+\item Show that $p:\mathbb{Z}\to\mathbb{Z}$, $p(n)=5-n$, is a bijection.
+\item Let $r:\{0,1,2,3,4,5\}\to\{0,1,2\}$, $r(n)=$ the remainder when $n$ is divided by $3$. Injective? Onto? Does the onto answer change if the codomain is $\{0,1,2,3\}$?
+\item How many functions are there from $\{1,2,3\}$ to $\{a,b\}$? How many are injective? How many are onto?
+\item Let $c:\mathcal{P}(\mathbb{N})\to\mathcal{P}(\mathbb{N})$, $c(A)=\{s\cdot t\mid s,t\in A\}$. Compute $c(\{0,2,3\})$. Then show $c$ is not onto.
+\end{enumerate}
+
+% ------------------------------------------------------------------
+\needspace{4\baselineskip}
+\subsection{Answers}
+
+\begin{enumerate}
+\item $A\times B=\{(x,1),(x,2),(x,3),(y,1),(y,2),(y,3)\}$. $|B\times A|=3\cdot 2=6$, the same size as $A\times B$ even though the sets are different. $(1,x)\notin A\times B$, because the first component must come from $A$. (It is in $B\times A$.)
+\item A relation from $A$ to $B$ is any subset of $A\times B$, which has $6$ members. So there are $2^6=64$ relations, counting $\emptyset$ and $A\times B$ itself.
+\item Not symmetric. $R(2,4)$ holds but $R(4,2)$ doesn't, because $(4,2)\notin R$. That single pair is the whole answer. The fact that $(1,3)$ and $(3,1)$ mirror each other, and $(4,4)$ mirrors itself, doesn't help.
+\item Both are symmetric. The empty relation has no pairs, so ``if $R(x,y)$ then $R(y,x)$'' never has a true premise; it's vacuously true. The total relation contains every pair, so whenever $(x,y)$ is in it, $(y,x)$ is too.
+\item $P$ is symmetric: if $n+m=7$ then $m+n=7$, since addition doesn't care about order. $Q$ isn't: $Q(7,0)$ holds because $7-0=7$, but $Q(0,7)$ fails because $0-7=-7$.
+\item \begin{enumerate}
+\item Total function. Not injective ($2$ and $3$ both go to $b$). Not onto (nothing reaches $c$).
+\item Partial but not total. Uniqueness holds, but $2$ has no output.
+\item Not a partial function: $1$ is related to both $a$ and $b$.
+\item Total function, injective and onto, so a bijection.
+\end{enumerate}
+\item Injective: if $3n=3m$ then $n=m$. Not onto: $1$ is in the codomain, but $3n=1$ has no solution in $\mathbb{N}$ (it would need $n=1/3$).
+\item $g$ on $\mathbb{Z}$: not injective, $g(-2)=g(2)=4$. Not onto, $g(n)=2$ has no integer solution (and neither does $g(n)=-1$). $h$ on $\mathbb{N}$: injective now, since for $n,m\geq 0$, $n^2=m^2$ forces $n=m$. Still not onto: $2$ is never a square of a natural number.
+\item Injective: if $5-n=5-m$, subtract $5$ from both sides and multiply by $-1$ to get $n=m$. Onto: take any $y\in\mathbb{Z}$; the input $5-y$ is an integer and $p(5-y)=5-(5-y)=y$. Both hold, so $p$ is a bijection.
+\item Not injective: $r(0)=r(3)=0$. Onto $\{0,1,2\}$: $r(0)=0$, $r(1)=1$, $r(2)=2$. With codomain $\{0,1,2,3\}$ it's no longer onto, because a remainder after dividing by $3$ is never $3$. Same arrows, different codomain, different answer.
+\item Each of the $3$ inputs independently picks one of $2$ outputs, so there are $2^3=8$ functions. None is injective: three inputs and only two outputs means two inputs must share. Onto means both $a$ and $b$ get used; only the two constant functions (all $a$, all $b$) fail that, so $8-2=6$ are onto.
+\item Go through all $9$ ordered pairs from $\{0,2,3\}$: the products are $0,0,0,0,4,6,0,6,9$. So $c(\{0,2,3\})=\{0,4,6,9\}$. Not onto: $\{2\}$ is a member of the codomain $\mathcal{P}(\mathbb{N})$, but nothing maps to it. If $c(A)=\{2\}$, then $A$ is not empty (since $c(\emptyset)=\emptyset$), so pick any $s\in A$. Taking $t=s$ puts $s^2$ in $c(A)$, so $s^2=2$, and no natural number squares to $2$.
+\end{enumerate}
