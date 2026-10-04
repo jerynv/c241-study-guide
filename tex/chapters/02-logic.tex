@@ -29,7 +29,7 @@ The ideas in this chapter aren't hard. What costs points is \emph{evidence}, bec
 Compare ``$A\cap B$'' with ``$A\cap B=\varnothing$''. The first one names a thing (a set). The second one says something about that thing, and it's either true or false. That's the whole distinction.
 
 \begin{notebox}
-\textbf{Proposition.} A statement: something that asserts a fact and so is true or false (even if you don't know which yet, or it depends on a variable).\\
+\textbf{Proposition.} A statement: a declarative sentence that makes a claim. It still counts if you don't know whether it's true, or if that depends on a variable.\\
 \textbf{Expression.} Something that names a value: a number, a set, a string. ``$x^2-3$'', ``$A\cup B$'', ``the set of odd primes''.
 \end{notebox}
 
@@ -218,7 +218,7 @@ Two formulas can look nothing alike and still say the same thing.
 \textbf{Logical equivalence.} $p\equiv q$ when every assignment that satisfies one also satisfies the other. Equivalently, their final columns match row for row. (Another way to say it: $p\leftrightarrow q$ is a tautology.)
 \end{notebox}
 
-In this course you prove equivalence with a full truth table. Named rewriting laws (De Morgan's, distribution, and so on) are \emph{not} accepted as justification here. You may know them from elsewhere, and they're fine for guessing an answer, but the table is the proof.
+In this course you prove equivalence with a full truth table. The notes never introduce named rewriting laws (De Morgan's, distribution, and so on), so don't rely on them as justification. You may know them from elsewhere, and they're fine for guessing an answer, but the table is the proof.
 
 \textbf{Worked example.} Is $\lnot(P\land Q)\equiv\lnot P\lor\lnot Q$?
 
@@ -244,7 +244,7 @@ One more equivalence worth knowing because it describes how a conditional fails:
 \textbf{Where people slip.}
 \begin{itemize}
   \item Checking two or three rows and declaring the formulas equivalent. Matching on some rows proves nothing; every row has to match.
-  \item Citing ``by De Morgan's law''. Here, that's an unsupported claim. Draw the table.
+  \item Citing ``by De Morgan's law''. The notes never give you that law, so draw the table.
   \item Confusing $\equiv$ with $=$. $\equiv$ compares formulas across all assignments; $=$ is for sets and numbers.
 \end{itemize}
 
